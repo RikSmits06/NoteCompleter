@@ -6,12 +6,14 @@
 #include "EditField.h"
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "../AutoComplete/trieComplete.h"
+#include "../AutoComplete/TrieCompleteMostCommon.h"
+
+#include "imgui_impl_opengl3_loader.h"
 
 namespace
 {
     bool showing = true;
-    autoComplete::TrieComplete completer = autoComplete::TrieComplete();
+    autoComplete::TrieCompleteMostCommon completer = autoComplete::TrieCompleteMostCommon();
     std::string prefix;
     bool completerFilled = false;
 }
@@ -26,11 +28,14 @@ void AutoCompleteWidget::renderAutoComplete()
     if (!completerFilled)
     {
         completerFilled = true;
-        std::ifstream file("../words.txt");
+        std::ifstream file("../NoteCompleter/Words/wordsMostCommon.txt");
         std::string line;
+        // Counter to increase the weight of each word (only works if the words in the file are ordered from most common to least common!)
+        uint32_t counter = 0;
         while (std::getline(file, line))
         {
-            completer.addWord(line);
+            completer.addWord(line, counter);
+            counter++;
         }
         file.close();
     }
