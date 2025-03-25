@@ -50,6 +50,7 @@ namespace
 
     int editCallback(ImGuiInputTextCallbackData* data)
     {
+        std::cout << data->EventKey << "\n";
         std::string currentWord = extractCurrentWord(data->Buf, data->BufSize, data->CursorPos);
         AutoCompleteWidget::setAutoCompleteWord(currentWord);
         return 0;

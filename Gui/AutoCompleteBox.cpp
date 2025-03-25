@@ -12,15 +12,10 @@
 
 namespace
 {
-    bool showing = true;
+    bool showing = false;
     autoComplete::TrieCompleteMostCommon completer = autoComplete::TrieCompleteMostCommon();
     std::string prefix;
     bool completerFilled = false;
-}
-
-void AutoCompleteWidget::showAutoComplete()
-{
-    showing = true;
 }
 
 void AutoCompleteWidget::renderAutoComplete()
@@ -28,7 +23,7 @@ void AutoCompleteWidget::renderAutoComplete()
     if (!completerFilled)
     {
         completerFilled = true;
-        std::ifstream file("../NoteCompleter/Words/wordsMostCommon.txt");
+        std::ifstream file("../Words/wordsMostCommon.txt");
         std::string line;
         // Counter to increase the weight of each word (only works if the words in the file are ordered from most common to least common!)
         uint32_t counter = 0;
@@ -40,12 +35,24 @@ void AutoCompleteWidget::renderAutoComplete()
         file.close();
     }
 
+    if (!showing)
+    {
+        return;
+    }
+
+    auto suggestions = completer.retrieveWords(prefix, 5);
+
+    if (suggestions.empty())
+    {
+        return;
+    }
+
     ImGuiIO& io = ImGui::GetIO();
     ImGui::SetNextWindowPos(io.Ctx->PlatformImeData.InputPos);
     ImGui::Begin("##", nullptr,
                  ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_AlwaysAutoResize |
                  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-    for (std::string suggestion : completer.retrieveWords(prefix, 5))
+    for (std::string suggestion : suggestions)
     {
         ImGui::Text(suggestion.c_str());
     }
@@ -55,9 +62,5 @@ void AutoCompleteWidget::renderAutoComplete()
 void AutoCompleteWidget::setAutoCompleteWord(std::string word)
 {
     prefix = word;
-}
-
-void AutoCompleteWidget::hideAutoComplete()
-{
-    showing = false;
+    showing = word.size() >= MIN_CHAR_COUNT;
 }
