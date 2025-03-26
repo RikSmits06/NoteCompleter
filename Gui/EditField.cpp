@@ -50,9 +50,41 @@ namespace
 
     int editCallback(ImGuiInputTextCallbackData* data)
     {
-        std::cout << data->EventKey << "\n";
-        std::string currentWord = extractCurrentWord(data->Buf, data->BufSize, data->CursorPos);
-        AutoCompleteWidget::setAutoCompleteWord(currentWord);
+        if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
+        {
+            if (AutoCompleteWidget::isShowing())
+            {
+                std::string suggestion = AutoCompleteWidget::getCurrentSuggestion();
+                // Calculating how many to remove.
+                int l = 0;
+                int r = 0;
+                int pointer = data->CursorPos - 1;
+                while (pointer >= 0 && std::isalpha(data->Buf[pointer]))
+                {
+                    l++;
+                    pointer--;
+                }
+
+                pointer = data->CursorPos;
+                while (pointer < data->BufTextLen && std::isalpha(data->Buf[pointer]))
+                {
+                    r++;
+                    pointer++;
+                }
+                data->DeleteChars(data->CursorPos - l, l + r);
+                data->InsertChars(data->CursorPos, suggestion.c_str());
+            }
+            else
+            {
+                data->InsertChars(data->CursorPos, "\t");
+            }
+        }
+        else
+        {
+            std::string currentWord = extractCurrentWord(data->Buf, data->BufSize, data->CursorPos);
+            AutoCompleteWidget::setAutoCompleteWord(currentWord);
+        }
+
         return 0;
     }
 }
@@ -72,8 +104,8 @@ void EditWidget::addEditField(const std::string& title)
     ImGui::PushItemWidth(io.DisplaySize.x);
     ImGui::InputTextMultiline("##", buffers[title], STANDARD_BUFFER_SIZE,
                               ImGui::GetContentRegionAvail(),
-                              ImGuiInputTextFlags_AllowTabInput |
-                              ImGuiInputTextFlags_CallbackEdit,
+                              ImGuiInputTextFlags_CallbackEdit |
+                              ImGuiInputTextFlags_CallbackCompletion,
                               editCallback);
     ImGui::PopItemWidth();
     ImGui::End();
