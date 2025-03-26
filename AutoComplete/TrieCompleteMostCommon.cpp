@@ -66,6 +66,11 @@ void autoComplete::TrieCompleteMostCommon::addWord(std::string word, uint32_t we
 
 std::vector<std::string> autoComplete::TrieCompleteMostCommon::retrieveWords(std::string prefix, uint32_t max)
 {
+    return retrieveWords(prefix, max, 20);
+}
+
+std::vector<std::string> autoComplete::TrieCompleteMostCommon::retrieveWords(std::string prefix, uint32_t max, uint32_t maxSearchLimit)
+{
     std::vector<std::string> retOrdered;
     std::map<uint32_t, std::string> retWeight;
     
@@ -85,7 +90,7 @@ std::vector<std::string> autoComplete::TrieCompleteMostCommon::retrieveWords(std
     std::vector<Node *> toCheck;
     toCheck.push_back(current);
 
-    while (!toCheck.empty() && retWeight.size() < max) {
+    while (!toCheck.empty() && retWeight.size() < maxSearchLimit) {
         // Pops the first node to check for a word.
         Node *checkingNode = toCheck[0];
         toCheck.erase(toCheck.begin());
@@ -101,6 +106,10 @@ std::vector<std::string> autoComplete::TrieCompleteMostCommon::retrieveWords(std
     // Extract words from retWeight in sorted order (smallest weight first).
     for (const auto &pair: retWeight) {
         retOrdered.push_back(pair.second);
+        if (retOrdered.size() >= max)
+        {
+            break;
+        }
     }
     
     return retOrdered;

@@ -75,6 +75,7 @@ std::string AutoCompleteWidget::getCurrentSuggestion()
 void AutoCompleteWidget::setAutoCompleteWord(std::string word)
 {
     prefix = word;
-    suggestions = completer.retrieveWords(prefix, 5);
+    // Increase max count in function to find the more common words higher in the tree.
+    suggestions = completer.retrieveWords(prefix, 5, 40);
     showing = (word.size() >= MIN_CHAR_COUNT) && !suggestions.empty();
 }

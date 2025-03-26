@@ -36,6 +36,13 @@ namespace autoComplete
 
         std::vector<std::string> retrieveWords(std::string prefix, uint32_t max) override;
 
+        /// Retrieves <max> words that best match the prefix.
+        /// @param prefix The prefix to search for.
+        /// @param max The max amount of words retrieved/returned.
+        /// @param maxSearchLimit The max amount of words being searched. The higher, the more accurate the most common sort is.
+        /// @return Returns a list of words matching the prefix.
+        std::vector<std::string> retrieveWords(std::string prefix, uint32_t max, uint32_t maxSearchLimit);
+
     private:
         TrieNode root;
     };
