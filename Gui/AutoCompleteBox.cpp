@@ -15,6 +15,8 @@ namespace
     bool showing = false;
     autoComplete::TrieCompleteMostCommon completer = autoComplete::TrieCompleteMostCommon();
     std::string prefix;
+    std::vector<std::string> suggestions;
+    uint32_t suggestionIndex = 0;
     bool completerFilled = false;
 }
 
@@ -40,27 +42,39 @@ void AutoCompleteWidget::renderAutoComplete()
         return;
     }
 
-    auto suggestions = completer.retrieveWords(prefix, 5);
-
-    if (suggestions.empty())
-    {
-        return;
-    }
-
     ImGuiIO& io = ImGui::GetIO();
     ImGui::SetNextWindowPos(io.Ctx->PlatformImeData.InputPos);
     ImGui::Begin("##", nullptr,
                  ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_AlwaysAutoResize |
                  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-    for (std::string suggestion : suggestions)
+    for (std::size_t i = 0; i < suggestions.size(); i++)
     {
-        ImGui::Text(suggestion.c_str());
+        std::string suggestion = suggestions[i];
+        if (i == suggestionIndex)
+        {
+            ImGui::ButtonEx(suggestion.c_str());
+        }
+        else
+        {
+            ImGui::Text(suggestion.c_str());
+        }
     }
     ImGui::End();
+}
+
+bool AutoCompleteWidget::isShowing()
+{
+    return showing;
+}
+
+std::string AutoCompleteWidget::getCurrentSuggestion()
+{
+    return suggestions[suggestionIndex];
 }
 
 void AutoCompleteWidget::setAutoCompleteWord(std::string word)
 {
     prefix = word;
-    showing = word.size() >= MIN_CHAR_COUNT;
+    suggestions = completer.retrieveWords(prefix, 5);
+    showing = (word.size() >= MIN_CHAR_COUNT) && !suggestions.empty();
 }
