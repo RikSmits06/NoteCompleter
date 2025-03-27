@@ -6,7 +6,7 @@ namespace AutoCompleteWidget
     // The minimum amount of chars that need to be typed before the box appears.
     constexpr uint8_t MIN_CHAR_COUNT = 2;
 
-    /// Shows the auto complete box with sugestions.
+    /// Shows the auto complete box with suggestions.
     void renderAutoComplete();
 
     /// Checks wheter the autocomplete is rendered.

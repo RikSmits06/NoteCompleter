@@ -31,6 +31,7 @@ void AutoCompleteWidget::renderAutoComplete()
         uint32_t counter = 0;
         while (std::getline(file, line))
         {
+            line.erase(remove_if(line.begin(), line.end(), isspace));
             completer.addWord(line, counter);
             counter++;
         }

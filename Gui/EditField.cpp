@@ -73,6 +73,8 @@ namespace
                 }
                 data->DeleteChars(data->CursorPos - l, l + r);
                 data->InsertChars(data->CursorPos, suggestion.c_str());
+                // Set word to nothing after autocompleting to hide suggestion window.
+                AutoCompleteWidget::setAutoCompleteWord("");
             }
             else
             {
