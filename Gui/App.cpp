@@ -11,6 +11,7 @@
 #include "AutoCompleteBox.h"
 #include "Logging.h"
 #include "EditField.h"
+#include "imgui_internal.h"
 
 namespace
 {
@@ -58,6 +59,10 @@ App::App()
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    // Add custom font.
+    io.Fonts->AddFontFromFileTTF("segoeui.ttf", 23);
+    io.Fonts->Build();
+    
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(this->window, true);
     ImGui_ImplOpenGL3_Init("#version 330");

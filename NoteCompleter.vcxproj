@@ -343,6 +343,8 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="segoeui.ttf" />
+    <Content Include="seguisb.ttf" />
     <Content Include="Words\words.txt" />
     <Content Include="Words\wordsMostCommon.txt" />
   </ItemGroup>
