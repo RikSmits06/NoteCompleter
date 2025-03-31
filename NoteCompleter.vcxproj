@@ -311,6 +311,7 @@
       <AdditionalIncludeDirectories>imgui;include</AdditionalIncludeDirectories>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="AutoComplete\TrieCorrect.cpp" />
     <ClCompile Include="glad\gl.c" />
     <ClCompile Include="Gui\App.cpp" />
     <ClCompile Include="Gui\AutoCompleteBox.cpp" />
@@ -328,6 +329,7 @@
     <ClInclude Include="AutoComplete\AutoComplete.h" />
     <ClInclude Include="AutoComplete\TrieComplete.h" />
     <ClInclude Include="AutoComplete\TrieCompleteMostCommon.h" />
+    <ClInclude Include="AutoComplete\TrieCorrect.h" />
     <ClInclude Include="Gui\App.h" />
     <ClInclude Include="Gui\AutoCompleteBox.h" />
     <ClInclude Include="Gui\EditField.h" />
@@ -345,6 +347,7 @@
   <ItemGroup>
     <Content Include="segoeui.ttf" />
     <Content Include="seguisb.ttf" />
+    <Content Include="Words\wordAutoCorrect.csv" />
     <Content Include="Words\words.txt" />
     <Content Include="Words\wordsMostCommon.txt" />
   </ItemGroup>

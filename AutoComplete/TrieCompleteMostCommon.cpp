@@ -95,7 +95,7 @@ std::vector<std::string> autoComplete::TrieCompleteMostCommon::retrieveWords(std
         Node *checkingNode = toCheck[0];
         toCheck.erase(toCheck.begin());
         // Check if it contains a word that is larger than the current prefix.
-        if (!checkingNode->word.empty() && !(prefix.length() >= checkingNode->word.length())) {
+        if (!checkingNode->word.empty() && !(prefix.length() > checkingNode->word.length())) {
             retWeight.insert({checkingNode->weight, checkingNode->word});
         }
         // Add all children nodes to the checklist.

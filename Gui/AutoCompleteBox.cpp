@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include "EditField.h"
 #include "imgui.h"
@@ -9,11 +10,13 @@
 #include "../AutoComplete/TrieCompleteMostCommon.h"
 
 #include "imgui_impl_opengl3_loader.h"
+#include "../AutoComplete/TrieCorrect.h"
 
 namespace
 {
     bool showing = false;
     autoComplete::TrieCompleteMostCommon completer = autoComplete::TrieCompleteMostCommon();
+    autoComplete::TrieCorrect correcter = autoComplete::TrieCorrect();
     std::string prefix;
     std::vector<std::string> suggestions;
     uint32_t suggestionIndex = 0;
@@ -34,6 +37,17 @@ void AutoCompleteWidget::renderAutoComplete()
             line.erase(remove_if(line.begin(), line.end(), isspace));
             completer.addWord(line, counter);
             counter++;
+        }
+        file.close();
+        file.open("../Words/wordAutoCorrect.csv");
+        while (std::getline(file, line))
+        {
+            std::stringstream stream(line);
+            std::string wrongWord;
+            std::string correctWord;
+            std::getline(stream, wrongWord, ',');
+            std::getline(stream, correctWord, ',');
+            correcter.addWord(wrongWord, correctWord);
         }
         file.close();
     }
@@ -78,5 +92,10 @@ void AutoCompleteWidget::setAutoCompleteWord(std::string word)
     prefix = word;
     // Increase max count in function to find the more common words higher in the tree.
     suggestions = completer.retrieveWords(prefix, 5, 40);
+    //suggestions = correcter.retrieveWords(prefix, 5);
+    if (suggestions.empty())
+    {
+        suggestions = correcter.retrieveWords(prefix, 5);
+    }
     showing = (word.size() >= MIN_CHAR_COUNT) && !suggestions.empty();
 }

@@ -20,6 +20,7 @@ namespace
         ImGuiWindowFlags_NoResize;
     constexpr uint32_t STANDARD_BUFFER_SIZE = 10000;
     std::unordered_map<std::string, char*> buffers;
+    std::string prevWord;
 
 
     /// Gets the word the person is currently typing.
@@ -48,33 +49,42 @@ namespace
         return ret;
     }
 
+    void replaceWord(ImGuiInputTextCallbackData* data, std::string newWord, int offset)
+    {
+        std::string suggestion = newWord;
+        // Calculating how many to remove.
+        int l = 0;
+        int r = 0;
+        int pointer = data->CursorPos - 1 - offset;
+        if (pointer < 1)
+        {
+            return;
+        }
+        while (pointer >= 0 && std::isalpha(data->Buf[pointer]))
+        {
+            l++;
+            pointer--;
+        }
+
+        pointer = data->CursorPos - offset;
+        while (pointer < data->BufTextLen && std::isalpha(data->Buf[pointer]))
+        {
+            r++;
+            pointer++;
+        }
+        data->DeleteChars(data->CursorPos - l - offset, l + r);
+        data->InsertChars(data->CursorPos - offset, suggestion.c_str());
+        // Set word to nothing after autocompleting to hide suggestion window.
+        AutoCompleteWidget::setAutoCompleteWord("");
+    }
+
     int editCallback(ImGuiInputTextCallbackData* data)
     {
         if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
         {
             if (AutoCompleteWidget::isShowing())
             {
-                std::string suggestion = AutoCompleteWidget::getCurrentSuggestion();
-                // Calculating how many to remove.
-                int l = 0;
-                int r = 0;
-                int pointer = data->CursorPos - 1;
-                while (pointer >= 0 && std::isalpha(data->Buf[pointer]))
-                {
-                    l++;
-                    pointer--;
-                }
-
-                pointer = data->CursorPos;
-                while (pointer < data->BufTextLen && std::isalpha(data->Buf[pointer]))
-                {
-                    r++;
-                    pointer++;
-                }
-                data->DeleteChars(data->CursorPos - l, l + r);
-                data->InsertChars(data->CursorPos, suggestion.c_str());
-                // Set word to nothing after autocompleting to hide suggestion window.
-                AutoCompleteWidget::setAutoCompleteWord("");
+                replaceWord(data, AutoCompleteWidget::getCurrentSuggestion(), 0);
             }
             else
             {
@@ -84,7 +94,12 @@ namespace
         else
         {
             std::string currentWord = extractCurrentWord(data->Buf, data->BufSize, data->CursorPos);
+            if (currentWord.empty() && !prevWord.empty())
+            {
+                replaceWord(data, AutoCompleteWidget::getCurrentSuggestion(), 1);
+            }
             AutoCompleteWidget::setAutoCompleteWord(currentWord);
+            prevWord = currentWord;
         }
 
         return 0;
